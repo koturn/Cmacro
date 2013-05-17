@@ -762,15 +762,15 @@ do {                                                \
      *   printf("%d\n", *elm);
      * }
      *
-     * DA_FOREACH(elm, array2) {
-     *   DA_FOREACH(num, *elm) {
+     * SA_FOREACH(elm, array2) {
+     *   SA_FOREACH(num, *elm) {
      *     printf("%d\n", *num);
      *   }
      *   puts("");
      * }
      * @endcode
-     * @param          elm   要素を指す変数名
-     * @param [in,out] array 対象配列
+     * @param          elm    要素を指す変数名
+     * @param [in,out] array  対象配列
      */
 #    define SA_FOREACH(elm, array)  \
        for (register typeof(&array[0]) elm = (array); elm < array_end(array); ++elm)
