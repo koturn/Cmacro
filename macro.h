@@ -616,12 +616,12 @@ do {                                      \
  * @param [in,out] ...        次のステップ前に行う処理(省略可能)
  */
 #define $FOR_LOOP(n, STATEMENT, ...)                                                 \
-{                                                                                    \
+do {                                                                                 \
   register unsigned int __tmp_loop_var__;                                            \
   for (__tmp_loop_var__ = n; __tmp_loop_var__; --__tmp_loop_var__, ##__VA_ARGS__) {  \
     STATEMENT;                                                                       \
   }                                                                                  \
-}
+} while (0)
 
 
 /*!
@@ -635,13 +635,13 @@ do {                                      \
  * @param [in,out] ...        次のステップ前に行う処理(省略可能)
  */
 #define $WHILE_LOOP(n, STATEMENT, ...)             \
-{                                                  \
+do {                                               \
   register unsigned int __tmp_loop_var__ = n + 1;  \
   while (--__tmp_loop_var__) {                     \
     STATEMENT;                                     \
     __VA_ARGS__;                                   \
   }                                                \
-}
+} while (0)
 
 
 /*!
@@ -663,7 +663,7 @@ do {                                      \
  * @param [in,out] ...        次のステップ前に行う処理(省略可能)
  */
 #define $DUFFS_LOOP(n, STATEMENT, ...)             \
-{                                                  \
+do {                                               \
   register int __tmp_loop_var__ = ((n) + 7) >> 3;  \
   switch ((n) & 7) {                               \
     case 0: do { STATEMENT; __VA_ARGS__;           \
@@ -676,12 +676,12 @@ do {                                      \
     case 1:      STATEMENT; __VA_ARGS__;           \
             } while (--__tmp_loop_var__);          \
   }                                                \
-}
+} while (0)
 
 
 //! ダフのデバイスの記法その2
 #define $DUFFS_LOOP8(n, STATEMENT, ...)             \
-{                                                   \
+do {                                                \
   register int __tmp_loop_var__ = (n);              \
   switch (__tmp_loop_var__ & 7) {                   \
     case 0: do { STATEMENT; __VA_ARGS__;            \
@@ -694,58 +694,87 @@ do {                                      \
     case 1:      STATEMENT; __VA_ARGS__;            \
             } while ((__tmp_loop_var__ -= 8) > 0);  \
   }                                                 \
-}
+} while (0)
 
 
 #if __STDC_VERSION__ >= 199901L
+  /*!
+   * @brief C99規格でコンパイル可能なLOOPマクロ
+   *
+   * 内部でカウンタを用いることを想定していないfor文の代替として用いるとよい。
+   *   @code  gcc -std=c99 foo.c@endcode
+   * または、
+   *   @code  gcc -std=gnu99 foo.c@endcode
+   * とコンパイルすること。<br>
+   *
+   * 使用例:
+   * @code
+   * LOOP (100) {
+   *   printf("Hello World!\n");
+   * }
+   * @endcode
+   *
+   * @param [in]     n   ループ回数
+   * @param [in,out] ... 次のステップ前に行う処理(省略可能)
+   */
+#  define $LOOP(n, ...)  \
+     for (register unsigned int __loop_cnt__ = 0; __loop_cnt__ < (n); __loop_cnt__++, ##__VA_ARGS__)
 
-/*!
- * @brief C99規格でコンパイル可能なLOOPマクロ
- *
- * 内部でカウンタを用いることを想定していないfor文の代替として用いるとよい。
- *   @code  gcc -std=c99 foo.c@endcode
- * または、
- *   @code  gcc -std=gnu99 foo.c@endcode
- * とコンパイルすること。<br>
- *
- * 使用例:
- * @code
- * LOOP (100) {
- *   printf("Hello World!\n");
- * }
- * @endcode
- *
- * @param [in]     n   ループ回数
- * @param [in,out] ... 次のステップ前に行う処理(省略可能)
- */
-#define $LOOP(n, ...)  \
-  for (register unsigned int __loop_cnt__ = 0; __loop_cnt__ < (n); __loop_cnt__++, ##__VA_ARGS__)
+
+  /*!
+   * @brief C99規格でコンパイル可能なREPEATマクロ
+   *
+   * 内部でカウンタを用いることを想定したfor文の代替として用いるとよい。
+   *   @code  gcc -std=c99 foo.c@endcode
+   * または、
+   *   @code  gcc -std=gnu99 foo.c@endcode
+   * とコンパイルすること。<br>
+   *
+   * 使用例:
+   * @code
+   * REPEAT (int, i, 100) {
+   *   printf("i = %d\n", i);
+   * }
+   * @endcode
+   *
+   * @param [in]     type ループ制御変数の型
+   * @param [in]     cnt  ループ制御変数名
+   * @param [in]     n    ループ回数
+   * @param [in,out] ...  次のステップ前に行う処理(省略可能)
+   */
+#  define $REPEAT(type, cnt, n, ...)  \
+     for (register type cnt = 0; cnt < (n); cnt++, ##__VA_ARGS__)
 
 
-/*!
- * @brief C99規格でコンパイル可能なREPEATマクロ
- *
- * 内部でカウンタを用いることを想定したfor文の代替として用いるとよい。
- *   @code  gcc -std=c99 foo.c@endcode
- * または、
- *   @code  gcc -std=gnu99 foo.c@endcode
- * とコンパイルすること。<br>
- *
- * 使用例:
- * @code
- * REPEAT (int, i, 100) {
- *   printf("i = %d\n", i);
- * }
- * @endcode
- *
- * @param [in]     type ループ制御変数の型
- * @param [in]     cnt  ループ制御変数名
- * @param [in]     n    ループ回数
- * @param [in,out] ...  次のステップ前に行う処理(省略可能)
- */
-#define $REPEAT(type, cnt, n, ...)  \
-  for (register type cnt = 0; cnt < (n); cnt++, ##__VA_ARGS__)
-
+#  ifdef __GNUC__
+    /*!
+     * @brief 静的配列に対するforeachマクロ
+     *
+     * 次のように用いる。
+     * @code
+     * int array1[5] = {1, 2, 3, 4, 5};
+     * int array2[3][4] = {
+     *   {1,   2,   3,   4},
+     *   {11,  22,  33,  44},
+     *   {111, 222, 333, 444},
+     * };
+     * SA_FOREACH(elm, array1) {
+     *   printf("%d\n", *elm);
+     * }
+     *
+     * DA_FOREACH(elm, array2) {
+     *   DA_FOREACH(num, *elm) {
+     *     printf("%d\n", *num);
+     *   }
+     *   puts("");
+     * }
+     * @endcode
+     * @param          elm   要素を指す変数名
+     * @param [in,out] array 対象配列
+     */
+#    define SA_FOREACH(elm, array)  \
+       for (register typeof(&array[0]) elm = (array); elm < array_end(array); ++elm)
+#  endif
 #endif
 
 
