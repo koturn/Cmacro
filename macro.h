@@ -141,12 +141,12 @@ typedef unsigned char  uchar;
  * @param [in] fmt   配列の要素の書式指定文字列
  */
 #ifdef __GNUC__
-#define DUMP_ARRAY(array, len, fmt)                                                    \
-({                                                                                     \
-  register unsigned int __tmp__loop_var__;                                             \
-  for (__tmp__loop_var__ = 0; __tmp__loop_var__ < (len); __tmp__loop_var__++) {        \
-    printf(#array "[%u] = " fmt "\n", __tmp__loop_var__, (array)[__tmp__loop_var__]);  \
-  }                                                                                    \
+#define DUMP_ARRAY(array, len, fmt)                                                  \
+({                                                                                   \
+  register unsigned int __tmp_loop_var__;                                            \
+  for (__tmp_loop_var__ = 0; __tmp_loop_var__ < (len); __tmp_loop_var__++) {         \
+    printf(#array "[%u] = " fmt "\n", __tmp_loop_var__, (array)[__tmp_loop_var__]);  \
+  }                                                                                  \
 })
 
 #else
@@ -762,15 +762,15 @@ do {                                                \
      *   printf("%d\n", *elm);
      * }
      *
-     * SA_FOREACH(elm, array2) {
-     *   SA_FOREACH(num, *elm) {
+     * DA_FOREACH(elm, array2) {
+     *   DA_FOREACH(num, *elm) {
      *     printf("%d\n", *num);
      *   }
      *   puts("");
      * }
      * @endcode
-     * @param          elm    要素を指す変数名
-     * @param [in,out] array  対象配列
+     * @param          elm   要素を指す変数名
+     * @param [in,out] array 対象配列
      */
 #    define SA_FOREACH(elm, array)  \
        for (register typeof(&array[0]) elm = (array); elm < array_end(array); ++elm)
