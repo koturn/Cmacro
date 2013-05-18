@@ -6,15 +6,24 @@
  * マクロ名の先頭に"$"を付けている。
  *
  * @author    koturn 0;
- * @date      2013 05/18
+ * @date      2013 05/19
  * @file      macro.h
- * @version   1.15.1.0
+ * @version   1.15.2.0
  * @attention C99規格のマクロもあるので、注意すること
  */
 #ifndef MACRO_H
 #define MACRO_H
 
 #define koturn return  //!< Enable "koturn 0;"!! :)
+
+
+#ifdef __GNUC__
+#  define __DO__          (          //!< GCC用のdo ~ while (0) のdoに当たる部分
+#  define __WHILE_ZERO__  )          //!< GCC用のdo ~ while (0) のwhile (0) に当たる部分
+#else
+#  define __DO__          do         //!< do ~ while (0) の do (gcc以外で使用)
+#  define __WHILE_ZERO__  while (0)  //!< do ~ while (0) の while (0) (gcc以外で使用)
+#endif
 
 
 #if !defined(_STDIO_H_) && !defined(_INC_STDIO)
@@ -140,25 +149,13 @@ typedef unsigned char  uchar;
  * @param [in] len   配列の要素数
  * @param [in] fmt   配列の要素の書式指定文字列
  */
-#ifdef __GNUC__
 #define DUMP_ARRAY(array, len, fmt)                                                  \
-({                                                                                   \
+__DO__ {                                                                             \
   register unsigned int __tmp_loop_var__;                                            \
   for (__tmp_loop_var__ = 0; __tmp_loop_var__ < (len); __tmp_loop_var__++) {         \
     printf(#array "[%u] = " fmt "\n", __tmp_loop_var__, (array)[__tmp_loop_var__]);  \
   }                                                                                  \
-})
-
-#else
-#define DUMP_ARRAY(array, len, fmt)                                                  \
-do {                                                                                 \
-  register unsigned int __tmp_loop_var__;                                            \
-  for (__tmp_loop_var__ = 0; __tmp_loop_var__ < (len); __tmp_loop_var__++) {         \
-    printf(#array "[%u] = " fmt "\n", __tmp_loop_var__, (array)[__tmp_loop_var__]);  \
-  }                                                                                  \
-} while(0)
-
-#endif
+} __WHILE_ZERO__
 
 
 #ifdef DEBUG  /* ややこしいので、インデントして記述する */
@@ -192,24 +189,14 @@ do {                                                                            
        printf("%s at line %u : " #array "[%d] = " fmt "\n", __FILE__, __LINE__, (idx), (array)[idx])
 #  endif  // [#if __STDC_VERSION__ >= 199901L]  end
 
-#  ifdef __GNUC__
-     //! デバッグ用に配列の内容を全て表示する
-#    define DBG_DUMP_ARRAY(array, len, fmt)                                        \
-     ({                                                                            \
-       register unsigned int __tmp_loop_var__;                                     \
-       for (__tmp_loop_var__ = 0; __tmp_loop_var__ < (len); __tmp_loop_var__++) {  \
-         ELEMENT_TRACE(array, __tmp_loop_var__, fmt);                              \
-       }                                                                           \
-     })
-#  else   // [#ifdef __GNUC__]  else
-#    define DBG_DUMP_ARRAY(array, len, fmt)                                        \
-     do {                                                                          \
-       register unsigned int __tmp_loop_var__;                                     \
-       for (__tmp_loop_var__ = 0; __tmp_loop_var__ < (len); __tmp_loop_var__++) {  \
-         ELEMENT_TRACE(array, __tmp_loop_var__, fmt);                              \
-       }                                                                           \
-     } while (0)
-#  endif  // [#ifdef __GNUC__]  end
+   //! デバッグ用に配列の内容を全て表示する
+#  define DBG_DUMP_ARRAY(array, len, fmt)                                        \
+   __DO__ {                                                                      \
+     register unsigned int __tmp_loop_var__;                                     \
+     for (__tmp_loop_var__ = 0; __tmp_loop_var__ < (len); __tmp_loop_var__++) {  \
+       ELEMENT_TRACE(array, __tmp_loop_var__, fmt);                              \
+     }                                                                           \
+   } __WHILE_ZERO__
 #else   // [#ifdef DEBUG]  else
    //! デバッグ用変数トレース関数マクロ
 #  define DBG_TRACE(...)       (1 ? (void) 0 : printf(""))
@@ -370,24 +357,15 @@ do {                                                                            
  * @param [in,out] a    値1
  * @param [in,out] b    値2
  */
-#ifndef __GNUC__
 #define SWAP(type, a, b)                  \
-do {                                      \
+__DO__ {                                  \
   register type __tmp_swap_var__ = *(a);  \
   *(a) = *(b);                            \
   *(b) = __tmp_swap_var__;                \
-} while (0)
+} __WHILE_ZERO__
 
 
-#else
-#define SWAP(type, a, b)                  \
-({                                        \
-  register type __tmp_swap_var__ = *(a);  \
-  *(a) = *(b);                            \
-  *(b) = __tmp_swap_var__;                \
-})
-
-
+#ifdef __GNUC__
 /*!
  * @brief コンパイル時に型を決定するSWAPマクロ
  *
@@ -413,7 +391,6 @@ do {                                      \
   *(a) = *(b);                                    \
   *(b) = __tmp_swap_var__;                        \
 })
-
 #endif
 
 
@@ -616,12 +593,12 @@ do {                                      \
  * @param [in,out] ...        次のステップ前に行う処理(省略可能)
  */
 #define $FOR_LOOP(n, STATEMENT, ...)                                                 \
-do {                                                                                 \
+__DO__ {                                                                             \
   register unsigned int __tmp_loop_var__;                                            \
   for (__tmp_loop_var__ = n; __tmp_loop_var__; --__tmp_loop_var__, ##__VA_ARGS__) {  \
     STATEMENT;                                                                       \
   }                                                                                  \
-} while (0)
+} __WHILE_ZERO__
 
 
 /*!
@@ -635,13 +612,13 @@ do {                                                                            
  * @param [in,out] ...        次のステップ前に行う処理(省略可能)
  */
 #define $WHILE_LOOP(n, STATEMENT, ...)             \
-do {                                               \
+__DO__ {                                           \
   register unsigned int __tmp_loop_var__ = n + 1;  \
   while (--__tmp_loop_var__) {                     \
     STATEMENT;                                     \
     __VA_ARGS__;                                   \
   }                                                \
-} while (0)
+} __WHILE_ZERO__
 
 
 /*!
@@ -663,7 +640,7 @@ do {                                               \
  * @param [in,out] ...        次のステップ前に行う処理(省略可能)
  */
 #define $DUFFS_LOOP(n, STATEMENT, ...)             \
-do {                                               \
+__DO__ {                                           \
   register int __tmp_loop_var__ = ((n) + 7) >> 3;  \
   switch ((n) & 7) {                               \
     case 0: do { STATEMENT; __VA_ARGS__;           \
@@ -676,12 +653,12 @@ do {                                               \
     case 1:      STATEMENT; __VA_ARGS__;           \
             } while (--__tmp_loop_var__);          \
   }                                                \
-} while (0)
+} __WHILE_ZERO__
 
 
 //! ダフのデバイスの記法その2
 #define $DUFFS_LOOP8(n, STATEMENT, ...)             \
-do {                                                \
+__DO__ {                                            \
   register int __tmp_loop_var__ = (n);              \
   switch (__tmp_loop_var__ & 7) {                   \
     case 0: do { STATEMENT; __VA_ARGS__;            \
@@ -694,7 +671,7 @@ do {                                                \
     case 1:      STATEMENT; __VA_ARGS__;            \
             } while ((__tmp_loop_var__ -= 8) > 0);  \
   }                                                 \
-} while (0)
+} __WHILE_ZERO__
 
 
 #if __STDC_VERSION__ >= 199901L
