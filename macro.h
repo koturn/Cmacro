@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/19
  * @file      macro.h
- * @version   1.15.2.0
+ * @version   1.15.3.0
  * @attention C99規格のマクロもあるので、注意すること
  */
 #ifndef MACRO_H
@@ -735,12 +735,11 @@ __DO__ {                                            \
      *   {11,  22,  33,  44},
      *   {111, 222, 333, 444},
      * };
-     * SA_FOREACH(elm, array1) {
+     * FOREACH_SA(elm, array1) {
      *   printf("%d\n", *elm);
      * }
-     *
-     * DA_FOREACH(elm, array2) {
-     *   DA_FOREACH(num, *elm) {
+     * FOREACH_SA(elm, array2) {
+     *   FOREACH_SA(num, *elm) {
      *     printf("%d\n", *num);
      *   }
      *   puts("");
@@ -749,7 +748,7 @@ __DO__ {                                            \
      * @param          elm   要素を指す変数名
      * @param [in,out] array 対象配列
      */
-#    define SA_FOREACH(elm, array)  \
+#    define FOREACH_SA(elm, array)  \
        for (register typeof(&array[0]) elm = (array); elm < array_end(array); ++elm)
 #  endif
 #endif
