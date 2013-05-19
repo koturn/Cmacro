@@ -15,11 +15,9 @@
 #define COMPAT_H
 
 
-#if _MSC_VER >= 1400  // Visual C++ (2005以降) のコンパイラならば
-
-
+// Visual C++ (2005以降) のコンパイラならば
+#if _MSC_VER >= 1400 && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES != 1
 #define SCAN_S_ARG(arg)   (arg), (_countof(arg))
-
 
 /* ------------------------------------------------------------
  * 入出力関係
@@ -39,11 +37,13 @@
 #  define memmove(dst, src, count)  (memmove_s(dst, _countof(dst), src, count), (void *)dst)
 #  define strcpy(dst, src)          (strcpy_s(dst, _countof(dst), src), dst)
 #  define strcat(dst, src)          (strcat_s(dst, _countof(dst), src), dst)
-#  define strncat(dst, src, count)  (strncat(dst, _countof(dst), src, _TRUNCATE), dst)
-#  define strncpy(dst, src, count)  (strncpy(dst, _countof(dst), src, _TRUNCATE), dst)
+#  define strncat(dst, src, count)  (strncat_s(dst, _countof(dst), src, _TRUNCATE), dst)
+#  define strncpy(dst, src, count)  (strncpy_s(dst, _countof(dst), src, _TRUNCATE), dst)
 #  define strlwr(str)               (_strlwr_s(str, _countof(str)), str)
 #  define strupr(str)               (_strupr_s(str, _countof(str)), str)
 #endif
+
+
 
 
 #else
