@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/20
  * @file      compat.h
- * @version   0.1.3.0
+ * @version   0.1.4.0
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
@@ -31,13 +31,19 @@
 
 /* ------------------------------------------------------------
  * 文字列関係
+ * dstに当たる部分が静的配列のみであれば、SA_ONLYマクロを
+ * 予め定義しておくこと
  * ------------------------------------------------------------ */
-#define strcpy(dst, src)          (strcpy_s(dst, _countof(dst), src), dst)
-#define strcat(dst, src)          (strcat_s(dst, _countof(dst), src), dst)
-#define strncat(dst, src, count)  (strncat(dst, _countof(dst), src, _TRUNCATE), dst)
-#define strncpy(dst, src, count)  (strncpy(dst, _countof(dst), src, _TRUNCATE), dst)
-
-
+#ifdef SA_ONLY
+#  define memcpy(dst, src, count)   (memcpy_s(dst, _countof(dst), src, count), (void *)dst)
+#  define memmove(dst, src, count)  (memmove_s(dst, _countof(dst), src, count), (void *)dst)
+#  define strcpy(dst, src)          (strcpy_s(dst, _countof(dst), src), dst)
+#  define strcat(dst, src)          (strcat_s(dst, _countof(dst), src), dst)
+#  define strncat(dst, src, count)  (strncat(dst, _countof(dst), src, _TRUNCATE), dst)
+#  define strncpy(dst, src, count)  (strncpy(dst, _countof(dst), src, _TRUNCATE), dst)
+#  define strlwr(str)               (_strlwr_s(str, _countof(str)), str)
+#  define strupr(str)               (_strupr_s(str, _countof(str)), str)
+#endif
 
 
 #else
@@ -67,17 +73,22 @@ typedef int errno_t;
 
 /* ------------------------------------------------------------
  * scanf関係(可変引数部分でサイズ指定の必要がなければ、問題はない)
+ * 可変部分でサイズ指定が無い場合、NOUSE_S_FORMATマクロを
+ * 予め定義しておくこと
  * ------------------------------------------------------------ */
 #define SCAN_S_ARG(arg)   (arg)
 
-#define fscanf_s(fp, fmt, ...)       \
-  fscanf(fp, fmt, ##__VA_ARGS__)
 
-#define scanf_s(fmt, dst, dst_size)  \
-  scanf(fmt, dst)
+#ifdef NOUSE_S_FORMAT
+#  define fscanf_s(fp, fmt, ...)       \
+     fscanf(fp, fmt, ##__VA_ARGS__)
 
-#define sscanf_s(str, fmt, ...)      \
-  sscanf(str, fmt, ##__VA_ARGS__)
+#  define scanf_s(fmt, dst, dst_size)  \
+     scanf(fmt, dst)
+
+#  define sscanf_s(str, fmt, ...)      \
+     sscanf(str, fmt, ##__VA_ARGS__)
+#endif
 
 
 /* ------------------------------------------------------------
