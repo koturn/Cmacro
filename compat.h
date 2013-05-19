@@ -8,14 +8,14 @@
  * @author    koturn 0;
  * @date      2013 05/19
  * @file      compat.h
- * @version   0.1.1.0
+ * @version   0.1.2.0
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
 #define COMPAT_H
 
 
-#ifdef _MSC_VER >= 1400  // Visual C++ (2005以降) のコンパイラならば
+#if _MSC_VER >= 1400  // Visual C++ (2005以降) のコンパイラならば
 
 
 #define SCAN_S_ARG(arg)   (arg), (_countof(arg))
@@ -26,7 +26,6 @@
  * ------------------------------------------------------------ */
 #define printf(fmt, ...)           printf_s(fmt, ##__VA_ARGS__)
 #define gets(dst)                  gets_s(dst, _countof(dst) - 1)
-#define FOPEN(fp, filename, mode)  (fopen_s(&(fp), filename, mode), fp)
 
 
 /* ------------------------------------------------------------
@@ -41,6 +40,7 @@
 
 
 #else
+typedef int errno_t;
 #define DUMMY_ERROR_NO  ((errno_t) 0)  //!< ダミーのエラーナンバー(0はエラー無しの意味)
 
 
