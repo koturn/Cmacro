@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/19
  * @file      macro.h
- * @version   1.15.3.0
+ * @version   1.15.4.0
  * @attention C99規格のマクロもあるので、注意すること
  */
 #ifndef MACRO_H
@@ -93,20 +93,20 @@ typedef unsigned char  uchar;
 
 /* ------------------------------------------------------------
  * デバッグ用の出力関数
- * DEBUGマクロが定義されているときのみ有効。
- * DEBUGマクロが定義されていなければ、コンパイラの最適化により、
+ * NDEBUGマクロが定義されていないときのみ有効。
+ * NDEBUGマクロが定義されていれば、コンパイラの最適化により、
  * コード自体が除去される。
  *
- *   #ifdef DEBUG
- *   #define dbg_printf  printf
+ *   #ifndef NDEBUG
+ *   #  define dbg_printf  printf
  *   #else
- *   #define dbg_printf  1 ? (void) 0 : printf
+ *   #  define dbg_printf  1 ? (void) 0 : printf
  *   #endif
  * のように、短く記述してもよかったが、
  *   3項演算子を悪用されないようにする
  * といった観点から、長い記述を用いた。
  * ------------------------------------------------------------ */
-#ifdef DEBUG
+#ifndef NDEBUG
 #define dbg_printf(fmt, ...)         printf((fmt), ##__VA_ARGS__)           //!< デバッグ用 printf()関数
 #define dbg_println(fmt, ...)        println(fmt, ##__VA_ARGS__)            //!< デバッグ用 println()関数マクロ
 #define dbg_puts(msg)                puts(msg)                              //!< デバッグ用 puts()関数
@@ -158,7 +158,7 @@ __DO__ {                                                                        
 } __WHILE_ZERO__
 
 
-#ifdef DEBUG  /* ややこしいので、インデントして記述する */
+#ifndef NDEBUG  /* ややこしいので、インデントして記述する */
 #  if __STDC_VERSION__ >= 199901L
      //! 配列の1要素を、ファイル名、行番号、関数名と共に表示する
 #    define ELEMENT_TRACE(array, idx, fmt)  \
@@ -197,12 +197,12 @@ __DO__ {                                                                        
        ELEMENT_TRACE(array, __tmp_loop_var__, fmt);                              \
      }                                                                           \
    } __WHILE_ZERO__
-#else   // [#ifdef DEBUG]  else
+#else   // [#ifdef NDEBUG]  else
    //! デバッグ用変数トレース関数マクロ
 #  define DBG_TRACE(...)       (1 ? (void) 0 : printf(""))
    //! デバッグ用に配列の内容を全て表示する
 #  define DBG_DUMP_ARRAY(...)  (1 ? (void) 0 : printf(""))
-#endif  // [#ifdef DEBUG]  end
+#endif  // [#ifdef NDEBUG]  end
 
 
 /*!
@@ -211,7 +211,7 @@ __DO__ {                                                                        
  * 主に関数呼び出しに対して用いる。<br>
  * 使用例:
  *   @code  $debug printf("Hello World!\n");@endcode
- * DEBUGマクロが定義されていれば、このprintf()関数は有効となり、
+ * NDEBUGマクロが定義されていなければ、このprintf()関数は有効となり、
  * 定義されていなければ、このprintf()関数は無効となる。<br>
  * ただし、
  *   @code  $debug num = abs(-200);@endcode
@@ -227,7 +227,7 @@ __DO__ {                                                                        
  *   );
  * @endcode
  */
-#ifdef DEBUG
+#ifndef NDEBUG
 #  define $debug
 #else
 #  define $debug  1 ? (void) 0 :
@@ -244,7 +244,7 @@ __DO__ {                                                                        
  *   $DEBUG(printf("Hello World!\n"));
  *   $DEBUG(num = 10);
  * @endcode
- * DEBUGマクロが定義されていれば、このprintf()関数は有効となり、
+ * NDEBUGマクロが定義されていなければ、このprintf()関数は有効となり、
  * 定義されていなければ、このprintf()関数は無効となる。<br>
  * 可変引数を許容しているので、$debugマクロと同じく、
  * 以下の例のようにカンマ演算子を用いて複数のデバッグ式を記述できる。
@@ -256,7 +256,7 @@ __DO__ {                                                                        
  * @endcode
  * $debugマクロでも同様の使い方はできるので、$DEBUG()マクロのアドバンテージはそんなに多くない。<br>
  */
-#ifdef DEBUG
+#ifndef NDEBUG
 #  define $DEBUG(...)  (__VA_ARGS__)
 #else
 #  define $DEBUG(...)  (1 ? (void) 0 : (__VA_ARGS__))
@@ -905,7 +905,7 @@ __DO__ {                                            \
 
 //! 指定範囲の乱数値を得る
 #define rrange(a, b)  \
-  (a < b ? (rand() % (b - a + 1) + a) : (rand() % (a - b + 1) + b))
+  ((a) < (b) ? (rand() % ((b) - (a) + 1) + (a)) : (rand() % ((a) - (b) + 1) + (b)))
 
 
 /* ------------------------------------------------------------
