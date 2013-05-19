@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/20
  * @file      compat.h
- * @version   0.1.4.0
+ * @version   0.1.5.0
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
@@ -16,7 +16,7 @@
 
 
 // Visual C++ (2005以降) のコンパイラならば
-#if _MSC_VER >= 1400 && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES != 1
+#if _MSC_VER >= 1400 && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES != 1 && !defined(_CRT_SECURE_NO_WARNINGS)
 #define SCAN_S_ARG(arg)   (arg), (_countof(arg))
 
 /* ------------------------------------------------------------
@@ -29,10 +29,10 @@
 
 /* ------------------------------------------------------------
  * 文字列関係
- * dstに当たる部分が静的配列のみであれば、SA_ONLYマクロを
+ * dstに当たる部分が静的配列のみであれば、AUTO_SECUREマクロを
  * 予め定義しておくこと
  * ------------------------------------------------------------ */
-#ifdef SA_ONLY
+#ifdef AUTO_SECURE
 #  define memcpy(dst, src, count)   (memcpy_s(dst, _countof(dst), src, count), (void *)dst)
 #  define memmove(dst, src, count)  (memmove_s(dst, _countof(dst), src, count), (void *)dst)
 #  define strcpy(dst, src)          (strcpy_s(dst, _countof(dst), src), dst)
@@ -73,13 +73,13 @@ typedef int errno_t;
 
 /* ------------------------------------------------------------
  * scanf関係(可変引数部分でサイズ指定の必要がなければ、問題はない)
- * 可変部分でサイズ指定が無い場合、NOUSE_S_FORMATマクロを
+ * 可変部分でサイズ指定が無い場合、AUTO_UNSECUREマクロを
  * 予め定義しておくこと
  * ------------------------------------------------------------ */
 #define SCAN_S_ARG(arg)   (arg)
 
 
-#ifdef NOUSE_S_FORMAT
+#ifdef AUTO_UNSECURE
 #  define fscanf_s(fp, fmt, ...)       \
      fscanf(fp, fmt, ##__VA_ARGS__)
 
@@ -142,6 +142,11 @@ typedef int errno_t;
   || defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
    // require <Windows.h>
 #  define sleep(sec)  Sleep((sec) * 1000)  //!< Windwos向けのsleep()関数の代理
+#endif
+
+
+#if !defined(__cplusplus) && __STDC_VERSION__ < 199901L && !defined(__GNUC__)
+#  define inline  // inline指定が使えない処理系では、inline指定を消す
 #endif
 
 
