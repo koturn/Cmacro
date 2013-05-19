@@ -55,20 +55,23 @@ typedef int errno_t;
 /* ------------------------------------------------------------
  * 入出力関係
  * ------------------------------------------------------------ */
-#define printf_s(fp, fmt, ...)              \
+#define printf_s(fp, fmt, ...)                 \
   printf(fp, fmt, ##__VA_ARGS__)
 
-#define fprintf_s(fp, fmt, ...)             \
+#define fprintf_s(fp, fmt, ...)                \
   fprintf(fp, fmt, ##__VA_ARGS__)
 
-#define fopen_s(fpp, filename, mode)        \
+#define fopen_s(fpp, filename, mode)           \
   (*(fpp) = fopen(filename, mode), *(fpp) == NULL ? __DUMMY_ERR_NO_ERR__ : __DUMMY_ERR_NO_OK__)
 
-#define gets_s(dst, dst_size)               \
+#define gets_s(dst, dst_size)                  \
   fgets(dst, dst_size, stdin)
 
-#define sprintf_s(dst, dst_size, fmt, ...)  \
+#define sprintf_s(dst, dst_size, fmt, ...)     \
   sprintf(dst, fmt, ##__VA_ARGS__)
+
+#define getenv_s(ret, dst, dst_size, varname)  \
+  strcpy(dst, getenv(varname))
 
 
 /* ------------------------------------------------------------
