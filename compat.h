@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/20
  * @file      compat.h
- * @version   0.1.5.0
+ * @version   0.1.7.0
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
@@ -48,30 +48,30 @@
 
 #else
 typedef int errno_t;
-#define __DUMMY_ERR_NO_OK__   ((errno_t) 0)  //!< ダミーのエラーナンバー(0はエラー無しの意味)
-#define __DUMMY_ERR_NO_ERR__  ((errno_t) 1)  //!< ダミーのエラーナンバー(1はエラー有りの意味)
+#define __DUMMY_ERRNO_OK__   ((errno_t) 0)  //!< ダミーのエラーナンバー(0はエラー無しの意味)
+#define __DUMMY_ERRNO_ERR__  ((errno_t) 1)  //!< ダミーのエラーナンバー(1はエラー有りの意味)
 
 
 /* ------------------------------------------------------------
  * 入出力関係
  * ------------------------------------------------------------ */
-#define printf_s(fp, fmt, ...)                 \
+#define printf_s(fp, fmt, ...)              \
   printf(fp, fmt, ##__VA_ARGS__)
 
-#define fprintf_s(fp, fmt, ...)                \
+#define fprintf_s(fp, fmt, ...)             \
   fprintf(fp, fmt, ##__VA_ARGS__)
 
-#define fopen_s(fpp, filename, mode)           \
-  (*(fpp) = fopen(filename, mode), *(fpp) == NULL ? __DUMMY_ERR_NO_ERR__ : __DUMMY_ERR_NO_OK__)
+#define fopen_s(fpp, filename, mode)        \
+  (*(fpp) = fopen(filename, mode), *(fpp) == NULL ? __DUMMY_ERRNO_ERR__ : __DUMMY_ERRNO_OK__)
 
-#define gets_s(dst, dst_size)                  \
+#define gets_s(dst, dst_size)               \
   fgets(dst, dst_size, stdin)
 
-#define sprintf_s(dst, dst_size, fmt, ...)     \
+#define sprintf_s(dst, dst_size, fmt, ...)  \
   sprintf(dst, fmt, ##__VA_ARGS__)
 
 #define getenv_s(ret, dst, dst_size, varname)  \
-  strcpy(dst, getenv(varname))
+  (strcpy(dst, getenv(varname)), __DUMMY_ERRNO_OK__)
 
 
 /* ------------------------------------------------------------
@@ -98,31 +98,31 @@ typedef int errno_t;
  * 文字列関係
  * ------------------------------------------------------------ */
 #define memcpy_s(dst, dst_size, src, count)   \
-  (memcpy(dst, src, count), __DUMMY_ERR_NO_OK__)
+  (memcpy(dst, src, count), __DUMMY_ERRNO_OK__)
 
 #define memmove_s(dst, dst_size, src, count)  \
-  (memmove(dst, src, count), __DUMMY_ERR_NO_OK__)
+  (memmove(dst, src, count), __DUMMY_ERRNO_OK__)
 
 #define strcat_s(dst, dst_size, src)          \
-  (strcat(dst, src), __DUMMY_ERR_NO_OK__)
+  (strcat(dst, src), __DUMMY_ERRNO_OK__)
 
 #define strcpy_s(dst, dst_size, src)          \
-  (strcpy(dst, src), __DUMMY_ERR_NO_OK__)
+  (strcpy(dst, src), __DUMMY_ERRNO_OK__)
 
 #define strncat_s(dst, dst_size, src, count)  \
-  (strncat(dst, src, count), __DUMMY_ERR_NO_OK__)
+  (strncat(dst, src, count), __DUMMY_ERRNO_OK__)
 
 #define strncpy_s(dst, dst_size, src, count)  \
-  (strncpy(dst, src), __DUMMY_ERR_NO_OK__)
+  (strncpy(dst, src), __DUMMY_ERRNO_OK__)
 
 #define strtok_s(str, demimiter, next_token)  \
   strtok(str, delimiter)
 
 #define _strlwr_s(str, dst_size)              \
-  (strlwr(str), __DUMMY_ERR_NO_OK__)
+  (strlwr(str), __DUMMY_ERRNO_OK__)
 
 #define _strupr_s(str, dst_size)              \
-  (strupr(str), __DUMMY_ERR_NO_OK__)
+  (strupr(str), __DUMMY_ERRNO_OK__)
 
 
 /* ------------------------------------------------------------
@@ -139,7 +139,7 @@ typedef int errno_t;
 
 
 
-// Windowsならば、(Visual C++ / MinGW-gcc, g++)
+// Windowsならば、(Visual C++ / MinGW-gcc, MinGW-g++)
 #if defined(WIN16) || defined(_WIN16) || defined(__WIN16) || defined(__WIN16__)   \
   || defined(WIN32) || defined(_WIN32) || defined(__WIN32) || defined(__WIN32__)  \
   || defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
