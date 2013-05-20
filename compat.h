@@ -6,9 +6,9 @@
  * 完全な互換性はないので、注意すること。
  *
  * @author    koturn 0;
- * @date      2013 05/20
+ * @date      2013 05/21
  * @file      compat.h
- * @version   0.1.7.0
+ * @version   0.1.8
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
@@ -148,8 +148,13 @@ typedef int errno_t;
 #endif
 
 
-#if !defined(__cplusplus) && __STDC_VERSION__ < 199901L && !defined(__GNUC__)
-#  define inline  // inline指定が使えない処理系では、inline指定を消す
+// C言語のinline指定に関する修正
+#ifndef __cplusplus
+#  if defined(_MSC_VER)
+#    define inline  __inline  // Visual C++では、inlineではなく、__inline
+#  elif !defined(__GNUC__) && __STDC_VERSION__ < 199901L
+#    define inline            // inline指定が使えない処理系では、inline指定を消す
+#  endif
 #endif
 
 
