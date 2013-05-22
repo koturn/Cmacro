@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/23
  * @file      compat.h
- * @version   0.2.0
+ * @version   0.2.1
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
@@ -156,11 +156,13 @@ typedef int errno_t;
 #    define inline            // inline指定が使えない処理系では、inline指定を消す
 #    define __inline
 #  endif
-#  if _MSC_VER >= 1400 || defined(__GNUC__) && __STDC_VERSION__ < 199901L
-#    define restrict __restrict  // C99以前ではrestrictではなく、__restrict
-#  else
-#    define restrict             // restrictが使えない処理系では、restrict指定を消す
-#    define __restrict
+#  if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#    if _MSC_VER >= 1400 || defined(__GNUC__)
+#      define restrict __restrict  // Visual C++とC99以前のgccでは、restrictではなく、__restrict
+#    else
+#      define restrict             // restrictが使えない処理系では、restrict指定を消す
+#      define __restrict
+#    endif
 #  endif
 #endif
 
