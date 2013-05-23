@@ -8,7 +8,7 @@
  * @author    koturn 0;
  * @date      2013 05/23
  * @file      compat.h
- * @version   0.2.3
+ * @version   0.2.4
  * @attention 安全ではない置き換えがあるので、注意すること
  */
 #ifndef COMPAT_H
@@ -148,31 +148,35 @@ typedef int errno_t;
 #endif
 
 
-// C言語のinline指定、restrict指定に関する修正
+// inline指定に関する修正
 #ifndef __cplusplus
 #  if defined(_MSC_VER)
 #    define inline      __inline  // Visual C++では、inlineではなく、__inline
 #    define __inline__  __inline  // __inline__も同様
 #  elif !defined(__GNUC__) && __STDC_VERSION__ < 199901L
-#    define inline            // inline指定が使えない処理系では、inline指定を消す
+#    define inline                // inline指定が使えない処理系では、inline指定を消す
 #    define __inline
 #  endif
-#  if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#    if _MSC_VER >= 1400
-#      define restrict      __restrict  // Visual C++のCコンパイラでは、restrictと__restrict__は
-#      define __restrict__  __restrict  // 使えないが、__restrictは用いることができる
-#    elif defined(__GNUC__)
-#      define restrict      __restrict  // gccのC99以前ではrestrictではなく、__restrict
-#    else
-#      define restrict                  // restrictが使えない処理系では、restrict指定を消す
-#      define __restrict
-#      define __restrict__
-#    endif
+#endif
+
+// restrict指定に関する修正
+#if _MSC_VER >= 1400
+#  define restrict      __restrict  // Visual C++のCコンパイラでは、restrictと__restrict__は
+#  define __restrict__  __restrict  // 使えないが、__restrictは使える
+#elif __cplusplus
+#  define restrict      __restrict  // C++では、restrictは使えず、__restrict__は使える
+#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#  if defined(__GNUC__)
+#    define restrict    __restrict  // C99以前のgccではrestrictではなく、__restrict
+#  else
+#    define restrict                // restrictが使えない処理系では、restrict指定を消す
+#    define __restrict
+#    define __restrict__
 #  endif
 #endif
 
 
-// attributeの指定に関する修正
+// attribute指定に関する修正
 #ifndef __GNUC__
 #  define __attribute__(attr)  // attributeの指定が使えない処理系では、attributeを消す
 #endif
