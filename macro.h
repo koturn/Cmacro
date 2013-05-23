@@ -6,9 +6,9 @@
  * マクロ名の先頭に"$"を付けている。
  *
  * @author    koturn 0;
- * @date      2013 05/19
+ * @date      2013 05/23
  * @file      macro.h
- * @version   1.15.4.0
+ * @version   1.15.5.0
  * @attention C99規格のマクロもあるので、注意すること
  */
 #ifndef MACRO_H
@@ -799,7 +799,7 @@ __DO__ {                                            \
 #if defined(__cplusplus)  // C++は、C++0xのラムダを用いる
 #  define LAMBDA(rettype, ARG_LIST, BODY)  \
      ([&]ARG_LIST -> rettype { BODY; } )
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && !defined(__clang__)
 #  define LAMBDA(rettype, ARG_LIST, BODY)           \
    ({                                               \
      rettype __lambda_funcion__ ARG_LIST { BODY; }  \
