@@ -15,6 +15,12 @@
 #define COMPAT_H
 
 
+// Visual C++ のpopen / pcloseについて
+#ifdef _MSC_VER
+#  define popen(cmd, mode)  _popen(cmd, mode)
+#  define pclose(fp)        _pclose(fp)
+#endif
+
 // Visual C++ (2005以降) のコンパイラならば
 #if _MSC_VER >= 1400 && _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES != 1 && !defined(_CRT_SECURE_NO_WARNINGS)
 #define SCAN_S_ARG(arg)   (arg), (_countof(arg))
