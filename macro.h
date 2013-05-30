@@ -295,6 +295,8 @@ __DO__ {                                                                        
 #define CALLOC(type, n)        ((type *)calloc((n), sizeof(type)))
 //! realloc()のラッパー関数マクロ
 #define REALLOC(type, n, ptr)  ((type *)realloc((p), sizeof(type) * (n)))
+//! free()のラッパー関数マクロ(NULLクリアも組み込んでいる)
+#define FREE(ptr)              (free(ptr), (ptr) = NULL)
 
 
 
