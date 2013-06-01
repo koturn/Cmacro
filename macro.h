@@ -43,6 +43,7 @@ void *alloca (size_t size);             //!< alloca()関数のプロトタイプ
 void *malloc (size_t size);             //!< malloc()関数のプロトタイプ
 void *calloc (size_t n, size_t size);   //!< calloc()関数のプロトタイプ
 void *realloc(void *ptr, size_t size);  //!< realloc()関数のプロトタイプ
+void  free(void *ptr);                  //!< free()関数のプロトタイプ
 
 #  ifndef EXIT_SUCCESS
 #    define EXIT_SUCCESS  0  //!< システムが正常終了とする値
@@ -206,6 +207,17 @@ __DO__ {                                                                        
 
 
 /*!
+ * @brief コンパイル時assertマクロ
+ * @param [in] expr  検査する式
+ */
+#ifndef NDEBUG
+#  define STATIC_ASSERT(expr)  typedef char __STATIC_ASSERT_TYPE__[expr ? 1 : -1]
+#else
+#  define STATIC_ASSERT(expp)
+#endif
+
+
+/*!
  * @brief デバッグ用の式を記述できるマクロ
  *
  * 主に関数呼び出しに対して用いる。<br>
@@ -296,7 +308,7 @@ __DO__ {                                                                        
 //! realloc()のラッパー関数マクロ
 #define REALLOC(type, n, ptr)  ((type *)realloc((p), sizeof(type) * (n)))
 //! free()のラッパー関数マクロ(NULLクリアも組み込んでいる)
-#define FREE(ptr)              (free(ptr), (ptr) = NULL)
+#define FREE(ptr_p)            (free(*(ptr_p)), *(ptr_p) = NULL)
 
 
 
